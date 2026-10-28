@@ -1,0 +1,32 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: robot-shop-slo-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+    app: robot-shop
+    role: alert-rules
+spec:
+  groups:
+    - name: robot-shop-slo.rules
+      rules:
+        - alert: RobotShopPaymentAvailabilitySLOBreached
+          expr: |
+            (
+              kube_pod_status_ready{namespace="robot-shop", condition="true", pod=~"payment-.*"} == 0
+            )
+            or
+            (
+              absent(kube_pod_status_ready{namespace="robot-shop", condition="true", pod=~"payment-.*"}) == 1
+            )
+          for: 30s
+          labels:
+            severity: critical
+            service: payment
+            tier: backend
+            slo: "99.5%-availability"
+          annotations:
+            summary: "Payment Service SLO Error Budget Breached"
+            description: "Payment service is failing readiness or is unavailable in robot-shop namespace. 99.5% SLO error budget is rapidly burning."
+            runbook_url: "https://github.com/ShemaiahYaba/robot-shop/blob/main/RUNBOOK.md#robotshoppaymentavailabilityslobreached"
