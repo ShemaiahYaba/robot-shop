@@ -35,7 +35,7 @@ grafana:
   # Grafana 13 pulls many default plugins; keep startup lighter on small nodes
   plugins: []
   service:
-    type: ClusterIP
+    type: LoadBalancer
   sidecar:
     dashboards:
       enabled: true
