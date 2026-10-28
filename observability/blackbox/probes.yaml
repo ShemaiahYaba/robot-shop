@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: robot-shop-blackbox
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+    app: robot-shop
+spec:
+  jobName: robot-shop-blackbox
+  interval: 30s
+  module: http_2xx
+  prober:
+    url: prometheus-blackbox-exporter.monitoring.svc:9115
+    scheme: http
+    path: /probe
+  targets:
+    staticConfig:
+      static:
+        - http://web.robot-shop.svc.cluster.local:8080/
+        - http://catalogue.robot-shop.svc.cluster.local:8080/health
+        - http://cart.robot-shop.svc.cluster.local:8080/health
+        - http://payment.robot-shop.svc.cluster.local:8080/health
+      labels:
+        project: robot-shop
