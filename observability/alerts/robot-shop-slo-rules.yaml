@@ -29,4 +29,4 @@ spec:
           annotations:
             summary: "Payment Service SLO Error Budget Breached"
             description: "Payment service is failing readiness or is unavailable in robot-shop namespace. 99.5% SLO error budget is rapidly burning."
-            runbook_url: "https://github.com/ShemaiahYaba/robot-shop/blob/main/RUNBOOK.md#robotshoppaymentavailabilityslobreached"
+            runbook_url: "https://github.com/ShemaiahYaba/robot-shop/blob/master/RUNBOOK.md#robotshoppaymentavailabilityslobreached"
