@@ -1,4 +1,4 @@
-# Capstone 2 — Metrics (Step 2)
+# Capstone 2 — Observability
 
 ## Stack
 
@@ -6,6 +6,7 @@
 - `prometheus-blackbox-exporter` — HTTP probes for web / catalogue / cart / payment
 - `nginx-exporter` — scrapes `web` `/nginx_status` for request rate
 - ServiceMonitors for `cart` and `payment` `/metrics`
+- **Loki** (SingleBinary) + **Fluent Bit** DaemonSet — Robot Shop logs searchable by `service` and level
 
 ## Dashboard (as code)
 
@@ -23,6 +24,15 @@ Login: `admin` / password from Helm values (`prom-operator` unless changed).
 
 Open dashboard **Robot Shop RED**.
 
+### Logs (Explore → Loki)
+
+```logql
+{service="cart"}
+{service="payment"} |= "ERROR"
+{service="cart"} | json | level=~"(?i)error|warn|info"
+{service=~"web|catalogue|cart|payment"}
+```
+
 ## Reinstall / upgrade
 
 ```bash
@@ -35,4 +45,8 @@ helm upgrade --install prometheus-blackbox-exporter prometheus-community/prometh
 kubectl apply -f nginx-exporter/deployment.yaml
 kubectl apply -f servicemonitors/
 kubectl apply -f blackbox/probes.yaml
+
+helm upgrade --install loki grafana/loki -n monitoring -f logging/loki-values.yaml
+helm upgrade --install fluent-bit fluent/fluent-bit -n monitoring -f logging/fluent-bit-values.yaml
+kubectl apply -f logging/loki-datasource.yaml
 ```

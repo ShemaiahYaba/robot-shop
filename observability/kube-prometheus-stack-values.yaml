@@ -45,6 +45,21 @@ grafana:
       folderAnnotation: grafana_folder
       provider:
         foldersFromFilesStructure: false
+    datasources:
+      enabled: true
+      label: grafana_datasource
+      labelValue: "1"
+      searchNamespace: ALL
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      uid: loki
+      access: proxy
+      url: http://loki-gateway.monitoring.svc.cluster.local
+      isDefault: false
+      jsonData:
+        maxLines: 1000
+
 
 prometheus-node-exporter:
   resources:
