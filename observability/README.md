@@ -7,6 +7,7 @@
 - `nginx-exporter` — scrapes `web` `/nginx_status` for request rate
 - ServiceMonitors for `cart` and `payment` `/metrics`
 - **Loki** (SingleBinary) + **Fluent Bit** DaemonSet — Robot Shop logs searchable by `service` and level
+- **Jaeger** + **OpenTelemetry Collector** — synthetic checkout trace (web → catalogue → cart → payment)
 
 ## Dashboard (as code)
 
@@ -49,4 +50,17 @@ kubectl apply -f blackbox/probes.yaml
 helm upgrade --install loki grafana/loki -n monitoring -f logging/loki-values.yaml
 helm upgrade --install fluent-bit fluent/fluent-bit -n monitoring -f logging/fluent-bit-values.yaml
 kubectl apply -f logging/loki-datasource.yaml
+
+# Tracing (Step 4)
+kubectl apply -f tracing/jaeger.yaml
+kubectl apply -f tracing/otel-collector.yaml
+kubectl apply -f tracing/trace-workflow-configmap.yaml
+kubectl -n monitoring delete job trace-verification-job --ignore-not-found
+kubectl apply -f tracing/trace-job.yaml
+kubectl -n monitoring logs job/trace-verification-job -f
+kubectl -n monitoring get svc jaeger
 ```
+
+### Traces (Jaeger)
+
+Open the Jaeger LoadBalancer URL (port **16686**), search service **web**, or paste the Trace ID printed by the Job.
